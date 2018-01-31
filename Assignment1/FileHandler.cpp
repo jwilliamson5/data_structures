@@ -3,6 +3,15 @@
 FileHandler::FileHandler(std::string inputFilePath, std::string outputFilePath)
         :inputFilePath(inputFilePath), inputFile(inputFilePath), outputFilePath(outputFilePath), outputFile(outputFilePath) {}
 
+FileHandler::~FileHandler() {
+    if(inputFile.is_open()) {
+        inputFile.close();
+    }
+    if(outputFile.is_open()) {
+        outputFile.close();
+    }
+}
+
 bool FileHandler::hasLine() {
     return (inputFile.peek() != EOF);
 }

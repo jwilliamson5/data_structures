@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <fstream>
-//TODO Destructor
+
 class FileHandler {
 private:
     std::string inputFilePath;
@@ -12,6 +12,7 @@ private:
     std::ofstream outputFile;
 public:
     FileHandler(std::string inputFilePath, std::string outputFilePath);
+    virtual ~FileHandler();
     bool hasLine();
     std::string getLine();
     bool writeToFile(std::string data);

@@ -7,17 +7,19 @@
 class LineList {
 private:
     Node *first;
+    Node *currentNode;
     int currentLine;
     bool firstIsNull(std::string data);
 public:
     LineList();
     virtual ~LineList();
     void addLine(std::string data);
-    void insertBefore(int lineNum, std::string data);
-    void insertBeforeCurrent(std::string data);
-    void deleteLine(int lineNum);
-    void deleteMultiple(int start, int end);
-    void deleteCurrent();
+    void insertBefore(std::string data);
+    void deleteLine();
+    std::string displayLine();
+    void gotoLine(int line);
+    int getLineNum();
+    void subLine(std::string data);
     std::string toString();
     friend std::ostream &operator<<(std::ostream &os, const LineList &list);
 };
