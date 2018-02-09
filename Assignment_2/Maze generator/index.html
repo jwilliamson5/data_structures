@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maze Generator</title>
+</head>
+<body>
+<form name="options">
+    <label for="x">X:</label>
+    <input type="number" id="x" value="20" />
+    <label for="y">Y:</label>
+    <input type="number" id="y" value="20" />
+</form>
+<button onclick="drawMaze()">
+    Create maze
+</button>
+<form>
+    <textarea id="maze" rows="45" cols="45"></textarea>
+</form>
+<button id="copy" onclick="copyToClipboard()">
+    Copy to clipboard
+</button>
+<script src="mazeGenerator.js"></script>
+<script>
+    drawMaze();
+</script>
+</body>
+</html>
