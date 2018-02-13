@@ -10,6 +10,7 @@ class Node {
 public:
     Node *next;
     T *data;
+    Node(): data(nullptr), next(nullptr) {}
     Node(T *data, Node<T> *next):data(data), next(next) {};
     virtual ~Node() = default;
 };

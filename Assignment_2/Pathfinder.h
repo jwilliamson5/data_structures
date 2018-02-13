@@ -5,7 +5,7 @@
 #ifndef ASSIGNMENT_2_PATHFINDER_H
 #define ASSIGNMENT_2_PATHFINDER_H
 
-#include "Node.h"
+#include "Stack.h"
 
 struct Coord {
     Coord(int x, int y):x(x), y(y) {};
@@ -16,15 +16,18 @@ struct Coord {
 
 class Pathfinder {
 private:
-    Node<Coord> *path;
-    Pathfinder(Coord *currentPos, Coord *nextPos, Node<Coord> *path);
+    //Path taken through maze
+    Stack<Coord> *path;
+    //Private constructor used for in spawnNew method
+    Pathfinder(Coord *currentPos, Coord *nextPos, Stack<Coord> *path);
 public:
     Coord *currentPos;
     Coord *nextPos;
     Pathfinder(Coord *currentPos, Coord *nextPos);
     void MoveToNext();
+    //Spawns a clone of this to travel down a different path
     Pathfinder* spawnNew(Coord *nextPos);
-    Node<Coord>* getPath();
+    Stack<Coord>* getPath();
 };
 
 

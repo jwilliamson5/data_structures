@@ -6,37 +6,26 @@
 
 using namespace std;
 
-void gotoxy( int x, int y )
-{
-    COORD p = { x, y };
-    SetConsoleCursorPosition( GetStdHandle( STD_OUTPUT_HANDLE ), p );
-}
-
-void pause(float seconds) {
-    clock_t t;
-    t = clock();
-    while((float) (clock() - t) / CLOCKS_PER_SEC < seconds) {
-        continue;
-    }
-}
-
 int main() {
     ifstream mazeFile ("F:\\Users\\jwill\\data_structures\\Assignment_2\\maze.txt");
     int yLen = 0;
     string line;
+    //Manually get first line so I can get the width
     getline(mazeFile, line);
     int xLen = line.length();
     yLen++;
 
+    //Get height
     while(getline(mazeFile, line)) {
         yLen++;
     }
 
+    //Move back to top of file
     mazeFile.clear();
     mazeFile.seekg(0, ios::beg);
 
     string maze [yLen];
-
+    //Create the maze array
     for(int y = 0; y < yLen; y++) {
         getline(mazeFile, line);
         maze[y] = "";
@@ -48,7 +37,7 @@ int main() {
             }
         }
     }
-
+    //Second array to keep track of visited cells
     bool *checked [yLen];
     for(int y = 0; y < yLen; y++) {
         checked[y] = new bool [xLen];
@@ -56,125 +45,110 @@ int main() {
             checked[y][x] = false;
         }
     }
+    //Always start in the same place, so the first 2 squares will always be the same,
+    // and be marked as visited
     checked[1][0] = true;
     checked[1][1] = true;
 
-    auto *startPos = new Coord(0,1);
-    auto *nextPos = new Coord(1,1);
-    auto *currentPf = new Pathfinder(startPos, nextPos);
-    auto *finderQueue = new Node<Pathfinder>(currentPf, nullptr);
-    Node<Coord> *availablePaths = nullptr;
+    //Setup the initial values for the while loop
+    auto *currentPf = new Pathfinder(new Coord(0,1), new Coord(1,1));
+    auto *pfStack = new Stack<Pathfinder>();
+    pfStack->Push(currentPf);
+    auto *availablePaths = new Stack<Coord>();
 
     int nextx;
     int nexty;
-
+    //Maze always ends in the same place, so use that to end the search
     int endx = xLen - 1;
     int endy = yLen - 2;
 
-    while(finderQueue != nullptr) {
+    int dirs [4] = {0, 1, 2, 3};
+    int rIndex;
+    int dirPlaceholder;
+    srand (time(NULL));
+
+    while(currentPf != nullptr) {
+        //If the pathfinder isn't null, it will always have a next position.
         currentPf->MoveToNext();
 
-        for(int y = -1; y < 2; y ++) {
-            for(int x = -1; x < 2; x ++) {
-                if(abs(x) == abs(y)) {
-                    continue;
+        //Shuffle direction check order
+        for(int i = 0; i < sizeof(dirs); i++) {
+            rIndex = rand() % 3;
+            dirPlaceholder = dirs[i];
+            dirs[i] = dirs[rIndex];
+            dirs[rIndex] = dirPlaceholder;
+        }
+
+        //Loop through all 4 directions in random order to search for available paths
+        for(int i = 0; i < sizeof(dirs); i++) {
+
+            nextx = currentPf->currentPos->x;
+            nexty = currentPf->currentPos->y;
+
+            switch(dirs[i]) {
+                case (0):
+                    nexty -= 1;
+                    break;
+                case (1):
+                    nextx += 1;
+                    break;
+                case (2):
+                    nexty += 1;
+                    break;
+                case (3):
+                    nextx -= 1;
+                    break;
+            }
+            //True if end of maze is found
+            if(nextx == endx && nexty == endy) {
+                cout << "Solution found." << endl;
+
+                ofstream solvedMaze ("F:\\Users\\jwill\\data_structures\\Assignment_2\\solution.txt");
+                //Draw the solution path to the maze array
+                //Because it uses a stack, it draws backwards, not that it matters
+                auto* path = currentPf->getPath();
+                while(path->Peek() != nullptr) {
+                    maze[path->Peek()->data->y][path->Peek()->data->x] = '#';
+                    path->Pop();
                 }
-
-                nextx = currentPf->currentPos->x + x;
-                nexty = currentPf->currentPos->y + y;
-
-                if(nextx == endx && nexty == endy) {
-
-                    for(int a = 0; a < yLen; a++) {
-                        cout << maze[a] << endl;
-                    }
-
-                    Node<Coord> *reversePath = nullptr;
-                    Node<Coord> *path = currentPf->getPath();
-                    while(path != nullptr) {
-                        maze[path->data->y][path->data->x] = '#';
-                        reversePath = new Node<Coord>(path->data, reversePath);
-                        path = path->next;
-                    }
-
-                    ofstream solvedMaze ("F:\\Users\\jwill\\data_structures\\Assignment_2\\solution.txt");
-
-                    for(int a = 0; a < yLen; a++) {
-                        for(int b = 0; b < xLen; b++) {
-                            solvedMaze << maze[a][b];
-                        }
-                        solvedMaze << endl;
-                    }
-                    solvedMaze.close();
-                    cin.ignore();
-                    while(reversePath != nullptr) {
-                        gotoxy(reversePath->data->x, reversePath->data->y);
-                        cout << "#";
-                        reversePath = reversePath->next;
-                        pause(0.0001);
-                    }
-
-                    cin.ignore();
-                    return 0;
+                //Write the maze with solution to solution file
+                for(int a = 0; a < yLen; a++) {
+                    solvedMaze << maze[a] << endl;
                 }
+                solvedMaze.close();
 
-                if(checked[nexty][nextx]) {
-                    continue;
-                } else {
-                    checked[nexty][nextx] = true;
-                }
-                if(maze[nexty][nextx] == ' ') {
-                    availablePaths = new Node<Coord>(new Coord(nextx, nexty), availablePaths);
-                }
+                //End program
+                return 0;
+            }
+
+            if(checked[nexty][nextx]) {  //If cell has already been checked, skip
+                continue;
+            } else {
+                checked[nexty][nextx] = true;  //Else, mark as checked
+            }
+            if(maze[nexty][nextx] == ' ') { //If cell is a blank space, add to available path stack
+                availablePaths->Push(new Coord(nextx, nexty));
             }
         }
 
-        if(availablePaths != nullptr) {
-            currentPf->nextPos = availablePaths->data;
-            availablePaths = availablePaths->next;
-
-            while(availablePaths != nullptr) {
-                finderQueue = new Node<Pathfinder>(currentPf->spawnNew(availablePaths->data), finderQueue);
-                availablePaths = availablePaths->next;
+        //At least 1 path was found, add the first in the stack to the current Pathfinder
+        if(availablePaths->Peek() != nullptr) {
+            currentPf->nextPos = availablePaths->Peek()->data;
+            availablePaths->Pop();
+            //If more then 1 path was found, create additional pathfinders, and push them onto the stack
+            while(availablePaths->Peek() != nullptr) {
+                pfStack->Push(currentPf->spawnNew(availablePaths->Peek()->data));
+                availablePaths->Pop();
             }
-        } else {
-            finderQueue = finderQueue->next;
+        } else { //If no path was found, pop the current pathfinder, because it has hit a dead end.
+            pfStack->Pop();
         }
-
-        if(finderQueue != nullptr) {
-            currentPf = finderQueue->data;
+        //Grab the pathfinder on the top of the stack, and loop through again
+        if(pfStack->Peek() != nullptr) {
+            currentPf = pfStack->Peek()->data;
         }
     }
-
-    cout << "End not found\n";
+    //If the while loop is exited, then all the pathfinders hit dead ends, so no solution found.
+    cout << "No solution found.\n";
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
