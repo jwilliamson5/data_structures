@@ -4,6 +4,14 @@
 
 #include "Node.h"
 
+/***
+ * Automatically splits rows into columns using white space as delimiter.
+ * Type of white space doesn't matter, regex is used
+ * @param colCount Number of columns
+ * @param row Row of data
+ * @param firstSortCol Primary column to sort by
+ * @param secondSortCol Secondary column to sort by
+ */
 Node::Node(int colCount, std::string row, int firstSortCol, int secondSortCol)
         :colCount(colCount), firstSortCol(firstSortCol), secondSortCol(secondSortCol)
 {
@@ -16,13 +24,16 @@ Node::Node(int colCount, std::string row, int firstSortCol, int secondSortCol)
     for(; iter != end; ++iter) {
         columns[counter++] = *iter;
     }
-
 }
 
 Node::~Node() {
     delete (columns);
 }
-
+/***
+ * since std::toupper only does 1 char at a time, this method applies it to the entire string
+ * @param str String to uppercase
+ * @return Uppercased string
+ */
 std::string Node::toUpper(std::string str) const {
     std::string rtnStr;
     for (char i : str) {
@@ -31,6 +42,7 @@ std::string Node::toUpper(std::string str) const {
     return rtnStr;
 }
 
+///All comparisons are done keeping the data as a string. Raw numbers will not be sorted properly
 bool Node::operator<(const Node &rhs) const {
     std::string thisFirst = toUpper(columns[firstSortCol]),
     otherFirst = toUpper(rhs.columns[firstSortCol]),

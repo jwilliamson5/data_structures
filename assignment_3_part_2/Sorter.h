@@ -12,9 +12,10 @@
 class Sorter {
 private:
     std::string pathToFile;
+    std::string pathToOutput;
+
     int colCount;
     int lineCount;
-    std::ifstream inputFile;
 
     int firstSortCol;
     int secondSortCol;
@@ -26,10 +27,11 @@ private:
     void writeLine(int lineNum, std::string line);
 public:
     enum err_code {no_error, first_out_of_bounds, second_out_of_bounds};
-    explicit Sorter(std::string pathToFile);
+    Sorter(std::string pathToFile, std::string pathToOutput);
     ~Sorter();
     void Sort();
     int setSortCols(int firstSortCol, int secondSortCol);
+    std::string getOutputPath();
 };
 
 
