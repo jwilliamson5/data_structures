@@ -23,7 +23,7 @@ void copyArray(int* original, int* target, int arraySize) {
 int main() {
     string input;
     int arraySize;
-    bool writeValidationFile;
+    bool writeValidationFile = false;
     stringstream ss;
 
     smatch m;
@@ -92,10 +92,11 @@ int main() {
 
     for(int i = 0; i <= sorter.quick_sort; i++) {
         copyArray(baseArray, arrayToSort, arraySize);
+        cout << "Running " << sortTypeStrings[i] << "...\n";
         timer = clock();
         sorter.sort(arrayToSort, arraySize, Sorter::sortType(i));
         sort_time = double(clock() - timer) / CLOCKS_PER_SEC;
-
+        cout << sortTypeStrings[i] << ": " << sort_time << " seconds\n";
         if(writeValidationFile) {
             timeFile << sortTypeStrings[i] << ": " << printArray(arrayToSort, arraySize);
         } else {

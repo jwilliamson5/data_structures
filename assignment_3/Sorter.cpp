@@ -2,6 +2,8 @@
 // Created by jwill on 2018-03-16.
 //
 
+#include <math.h>
+#include <exception>
 #include "Sorter.h"
 
 void Sorter::bubbleSort(int *array, int arraySize) {
